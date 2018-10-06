@@ -50,7 +50,7 @@ public:
         cout<<"Cost                   : "<<cost<<"\n";
         cout<<"Time                   : "<<time<<" months\n";
         cout<<"Rating                 : "<<rating<<"\n";
-        cout<<"Tearcher's Expertise   : "<<teacher_expertise<<"\n";
+        cout<<"Teacher's Expertise    : "<<teacher_expertise<<"\n";
         cout<<"Content                : "<<content_quality<<"\n";
         cout<<"==========================================================================\n\n\n";
     }
@@ -60,12 +60,10 @@ ll population = 1000;
 ll courses = 40;
 
 int main(){
-	///file;
-
     ofstream fa("graph.csv");
     fa<<"Generation,Fitmax,Fitness"<<endl;
 
-	srand ( time(NULL) );
+	srand(time(NULL));
 
     pair<course,ll> p[population][courses];
 
@@ -80,7 +78,7 @@ int main(){
         c.rating = rand()%10 + 1;
         c.content_quality = rand()%10 + 1;
 
-        ///c.printCourse();
+        //c.printCourse();
 
         fori(i,population){
             p[i][j].ss = rand()%2;
@@ -97,38 +95,42 @@ int main(){
 
         ///cout<<"==========================GENERATION "<<(gen+1)<<"===============================\n";
 
-        double interest, cost, time, fitness, fitmax=lmin, fitAvg, cnt;
+        double interest, rating, cost, time, fitness, fitmax=lmin, fitAvg, cnt;
 
-        bool f=true;
         fori(i,population){
-            interest = cost = time = cnt = 0;
+            interest = rating = cost = time = cnt = 0;
+
             fori(j,courses){
                 if(p[i][j].ss==1){
 					///printf("1 ");
                     interest += p[i][j].ff.interest;
+                    rating += p[i][j].ff.rating;
                     cost += p[i][j].ff.cost;
                     time += p[i][j].ff.time;
                     cnt++;
                 }
                 ///else printf("0 ");
             }
+
+            //CONSTRAINTS
             if(cnt==0 || cost>60000 || time>18){
                 fitness=0.0;
                 fitmax=max(fitmax,fitness);
                 v.pb(mp(fitness,i));
                 continue;
             }
-
             
             /*
 			printf("Cost = %lf\nTime = %lf\n",cost,time);
-			printf("Interest Factor : %lf\n",(5) * (interest/(cnt*10.0)));
-			printf("Cost Factor    : %lf\n",(3) * (cost/(cnt*5000.0)));
-			printf("Time Factor    : %lf\n\n",(2) * (time/(cnt*2.0)));
+			printf("Interest Factor : %lf\n",(0.4) * (interest/(cnt*10.0)));
+			printf("Rating Factor   : %lf\n",(0.1) * (rating/(cnt*10.0)));
+			printf("Cost Factor     : %lf\n",(0.3) * (60000.0/cost));
+			printf("Time Factor     : %lf\n\n",(0.2) * (18.0/time));
             */
 
             fitness = 0.0;
-            fitness += (0.5) * (interest/(cnt*10.0));
+            fitness += (0.4) * (interest/(cnt*10.0));
+            fitness += (0.1) * (rating/(cnt*10.0));
             fitness += (0.3) * (60000.0/cost);
             fitness += (0.2) * (18.0/time);
 
@@ -137,11 +139,11 @@ int main(){
             fitAvg+=fitness;
             fitmax=max(fitmax,fitness);
         }
+
 		fitAvg/=(double)population;
         fa<<gen<<","<<fixed<<setprecision(5)<<fitmax<<","<<fixed<<setprecision(5)<<fitAvg<<endl;
 
         ///cout<<"======================================================================\n\n\n";
-
         
         stop.pb(fitAvg);
         if(gen>=199){
@@ -151,14 +153,12 @@ int main(){
                 smx = max(smx, stop[i]);
                 smn = min(smn, stop[i]);
             }
-            //cout<<smx<<" "<<smn<<endl;
             if(smx-smn<=0.015) break;
         }
-        
-        
+
         sort(all(v));
 
-        ///CROSS-OVER
+        //CROSS-OVER
         for(int k=0; k<(8.0*v.size())/10.0; k+=2){
 			int i=v[k].ss, j=v[k+1].ss;
 			int x = rand()%courses;
@@ -168,7 +168,7 @@ int main(){
             }
         }
 
-        ///MUTATION
+        //MUTATION
         fori(i,v.size()-1){
             int z = rand()%1000 + 1;
             if(z<=5){
@@ -176,6 +176,7 @@ int main(){
                 p[v[i].ss][x].ss = 1 - p[v[i].ss][x].ss;
             }
         }
+
         gen++;
     }
     return 0;
