@@ -153,7 +153,7 @@ int main(){
                 smx = max(smx, stop[i]);
                 smn = min(smn, stop[i]);
             }
-            if(smx-smn<=0.015) break;
+            if(smx-smn<=0.02) break;
         }
 
         sort(all(v));
